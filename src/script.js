@@ -1,3 +1,165 @@
+class Datepicker
+{
+	#_date;
+
+	#_connectedElement;
+
+	#_renderStatus;
+
+	#_idSelectMonth;
+
+	constructor(datepickerDate = new Date(), htmlElementForDatapickerConnect = null)
+	{
+		this.#_date = new Date(datepickerDate);
+		this.#_renderStatus = Boolean(false);
+		this.#_idSelectMonth = this.#_date.getMonth();
+
+		if (htmlElementForDatapickerConnect)
+		{
+			this.ConnectToHtmlElement(htmlElementForDatapickerConnect);
+		}
+	}
+
+	#SwitchRenderStatus()
+	{
+		this.#_renderStatus = Boolean(this.#_renderStatus ? false : true);
+	}
+
+	#RenderDatepickerTitle(htmlElementDatapicker)
+	{
+		const MONTH_NAMES = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+			"Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+		];
+
+		const DATEPICKER_TITLE = document.createElement('div');
+		DATEPICKER_TITLE.classList.add('row');
+
+		let swithMonthLeftButton = document.createElement('a');
+		swithMonthLeftButton.classList.add('col-4');
+		swithMonthLeftButton.style.textDecoration = 'none';
+		swithMonthLeftButton.innerText = '<<';
+
+		let monthText = document.createElement('p');
+		monthText.classList.add('col-4');
+		monthText.innerText = MONTH_NAMES[this.#_idSelectMonth];
+
+		let swithMonthRightButton = document.createElement('a');
+		swithMonthRightButton.classList.add('col-4');
+		swithMonthRightButton.style.textDecoration = 'none';
+		swithMonthRightButton.innerText = '>>';
+
+		swithMonthLeftButton.addEventListener('click', (event) =>
+		{
+			if (this.#_idSelectMonth > 0)
+			{
+				this.#_idSelectMonth--;
+			}
+			else
+			{
+				this.#_idSelectMonth = 11;
+			}
+
+			monthText.innerText = MONTH_NAMES[this.#_idSelectMonth];
+		});
+
+		swithMonthRightButton.addEventListener('click', (event) =>
+		{
+			if (this.#_idSelectMonth < 11)
+			{
+				this.#_idSelectMonth++;
+			}
+			else
+			{
+				this.#_idSelectMonth = 0;
+			}
+
+			monthText.innerText = MONTH_NAMES[this.#_idSelectMonth];
+		});
+
+		monthText.addEventListener('load', (event) =>
+		{
+			this.#RenderDatepickerBody(htmlElementDatapicker);
+		});
+
+		DATEPICKER_TITLE.appendChild(swithMonthLeftButton);
+		DATEPICKER_TITLE.appendChild(monthText);
+		DATEPICKER_TITLE.appendChild(swithMonthRightButton);
+
+		htmlElementDatapicker.appendChild(DATEPICKER_TITLE);
+	}
+
+	#RenderDatepickerBody(htmlElementDatapicker)
+	{
+		const DAYS_OF_WEEK = ["ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"];
+
+		const DATEPICKER_BODY = document.createElement('table');
+		DATEPICKER_BODY.classList.add('table');
+		DATEPICKER_BODY.classList.add('table-primary');
+
+		let collNames = document.createElement('thead');
+		let tableCollNamesRow = document.createElement('tr');
+
+		DAYS_OF_WEEK.forEach(element =>
+		{
+			let dayOfWeek = document.createElement('th');
+			dayOfWeek.innerText = element;
+
+			tableCollNamesRow.appendChild(dayOfWeek);
+		});
+
+		collNames.appendChild(tableCollNamesRow);
+
+		let tableBody = document.createElement('tbody');
+
+		let firstWeek = document.createElement('tr');
+
+		DATEPICKER_BODY.appendChild(collNames);
+		DATEPICKER_BODY.appendChild(tableBody);
+
+		htmlElementDatapicker.appendChild(DATEPICKER_BODY);
+	}
+
+	#RenderDatepicker()
+	{
+		if (!this.#_renderStatus)
+		{
+			const DATEPICKER = document.createElement('div');
+
+			const DATEPICKER_SCALE_MULTIPLIER_WIDTH = 6;
+			const DATEPICKER_SCALE_MULTIPLIER_HEIGHT = 3;
+			DATEPICKER.style.width = window.innerWidth / DATEPICKER_SCALE_MULTIPLIER_WIDTH;
+			DATEPICKER.style.height = window.innerHeight / DATEPICKER_SCALE_MULTIPLIER_HEIGHT;
+			DATEPICKER.style.backgroundColor = 'white';
+			DATEPICKER.style.border = 'black solid 1px';
+			DATEPICKER.style.position = 'absolute';
+			DATEPICKER.style.zIndex = 3;
+			DATEPICKER.style.marginTop = '50px';
+
+			this.#RenderDatepickerTitle(DATEPICKER);
+
+			this.#_connectedElement.parentNode.appendChild(DATEPICKER);
+			this.#_renderStatus = true;
+		}
+		else
+		{
+			this.#_connectedElement.removeChild(this.#_connectedElement.lastChild);
+		}
+	}
+
+	ConnectToHtmlElement(htmlElement)
+	{
+		// Add event for button of select date
+		htmlElement.addEventListener('click', (event) =>
+		{
+			this.#RenderDatepicker();
+		});
+
+		this.#_connectedElement = htmlElement;
+	}
+}
+
+const DATEPICKER_BUTTON_TYPES = { TEXT_FIELD: 'input', TEXT_FIELD_BUTTON: 'input-group' };
+
 class Task
 {
 	// Task name
@@ -38,6 +200,66 @@ class Task
 	set status(newStatus)
 	{
 		this.#_isDone = Boolean(newStatus);
+	}
+
+	get priority()
+	{
+		return this.#_priority;
+	}
+
+	get date()
+	{
+		return this.#_date;
+	}
+
+	set date(newDate)
+	{
+		return this.#_date = new Date(newDate);
+	}
+}
+
+class DatepickerField
+{
+	#_datepicker;
+
+	#_fieldInHtmlDocument;
+
+	constructor(date, classListForButton = Array(), fieldType = DATEPICKER_BUTTON_TYPES.TEXT_FIELD_BUTTON)
+	{
+		this.#_datepicker = new Datepicker();
+
+		if (fieldType === DATEPICKER_BUTTON_TYPES.TEXT_FIELD || fieldType === DATEPICKER_BUTTON_TYPES.TEXT_FIELD_BUTTON)
+		{
+			const DATEPICKER_BUTTON = document.createElement('div');
+
+			if (fieldType === DATEPICKER_BUTTON_TYPES.TEXT_FIELD_BUTTON)
+			{
+				DATEPICKER_BUTTON.classList.add('d-flex');
+
+				let dateTextInput = document.createElement('input');
+				dateTextInput.type = 'date';
+				dateTextInput.valueAsDate = date;
+				dateTextInput.title = 'Дата завершение'
+
+				classListForButton.forEach(element =>
+				{
+					dateTextInput.classList.add(element);
+				});
+
+				DATEPICKER_BUTTON.appendChild(dateTextInput);
+			}
+
+			this.#_fieldInHtmlDocument = DATEPICKER_BUTTON;
+		}
+	}
+	get htmlElement()
+	{
+		return this.#_fieldInHtmlDocument;
+	}
+
+	get newDate()
+	{
+		return this.#_datepicker.valueAsDate;
 	}
 }
 
@@ -111,20 +333,12 @@ class TaskList
 		taskContentsInputGroup.classList.add('mb-3');
 		taskContentsInputGroup.classList.add('mt-3');
 
+		let datepickerButton = new DatepickerField(task.date, ['form-control', 'text-center']);
+
 		// Create input with task text
 		let taskAsInputField = document.createElement('input');
 		taskAsInputField.classList.add('form-control');
 		taskAsInputField.classList.add('text-center');
-
-		// Set task color
-		if (task.status)
-		{
-			taskAsInputField.classList.add('text-success');
-		}
-		else
-		{
-			taskAsInputField.classList.add('text-danger');
-		}
 
 		// Set task text
 		taskAsInputField.value = task.name;
@@ -132,7 +346,18 @@ class TaskList
 		// Create button for switch task status
 		let switchTaskStatusButton = document.createElement('button');
 		switchTaskStatusButton.classList.add('btn');
-		switchTaskStatusButton.classList.add('btn-danger');
+
+		//Set task color
+		if (task.status)
+		{
+			taskAsInputField.classList.add('text-success');
+			switchTaskStatusButton.classList.add('btn-success');
+		}
+		else
+		{
+			taskAsInputField.classList.add('text-danger');
+			switchTaskStatusButton.classList.add('btn-danger');
+		}
 
 		// Create icon for button of switch task status
 		let iconSwitchTaskStatusButton = document.createElement('i');
@@ -149,6 +374,7 @@ class TaskList
 		deleteTaskButton.innerText = 'Delete';
 
 		// Visible elements for task contents in input group
+		taskContentsInputGroup.appendChild(datepickerButton.htmlElement);
 		taskContentsInputGroup.appendChild(taskAsInputField);
 		taskContentsInputGroup.appendChild(switchTaskStatusButton);
 		taskContentsInputGroup.appendChild(deleteTaskButton);
@@ -178,11 +404,11 @@ class TaskList
 
 			if (targetElement.classList.contains('bi'))
 			{
-				taskAsInputField = targetElement.parentNode.parentNode.firstChild;
+				taskAsInputField = targetElement.parentNode.parentNode.children[1];
 			}
 			else
 			{
-				taskAsInputField = targetElement.parentNode.firstChild;
+				taskAsInputField = targetElement.parentNode.children[1];
 			}
 
 			task.status = Boolean(!task.status);
@@ -260,7 +486,7 @@ class TaskList
 
 			for (let taskFromFile of dataFromFile)
 			{
-				let newTask = new Task(taskFromFile.taskName, taskFromFile.taskStatus);
+				let newTask = new Task(taskFromFile.taskName, taskFromFile.taskPriority, taskFromFile.taskDate, taskFromFile.taskStatus);
 				currentInstance.AddTask(newTask);
 				currentInstance.RenderAllTasks();
 			}
@@ -272,7 +498,7 @@ class TaskList
 		const FILE_TYPE = '.json';
 
 		let taskList = new Array();
-		const keysForJsonFile = ['taskName', 'taskStatus'];
+		const keysForJsonFile = ['taskName', 'taskPriority', 'taskDate', 'taskStatus'];
 
 		if (this.#_taskList.length)
 		{
@@ -282,7 +508,9 @@ class TaskList
 			{
 				let taskAsJson = {
 					[keysForJsonFile[0]]: task.name,
-					[keysForJsonFile[1]]: task.status
+					[keysForJsonFile[1]]: task.priority,
+					[keysForJsonFile[2]]: task.date,
+					[keysForJsonFile[3]]: task.status
 				};
 				tasksAsJson.push(taskAsJson);
 			}
@@ -390,7 +618,6 @@ let SaveDataToFile = (downloadButton, fileName = 'data') =>
 let btn_save = document.getElementById("btn-save");
 btn_save.addEventListener('click', () => { SaveDataToFile(btn_save) });
 
-
 let ChangeBackgroundColor = (newBackgroundColor) =>
 {
 	let navbarMenu = document.getElementById('main-menu');
@@ -408,6 +635,19 @@ let ChangeBackgroundColor = (newBackgroundColor) =>
 	{
 		navbarMenu.classList.remove(currentBackgroundColor);
 		navbarMenu.classList.add(newBackgroundColor);
+	}
+}
+
+let ChangeBackgroundColorBody = (newBackgroundColor) =>
+{
+	let navbarMenu = document.getElementsByTagName('body')[0];
+
+	if (navbarMenu.style.backgroundImage)
+	{
+		navbarMenu.style.backgroundImage = null;
+		navbarMenu.style.backgroundRepeat = null;
+		navbarMenu.style.backgroundSize = null;
+		navbarMenu.style.backgroundPosition = null;
 	}
 }
 
@@ -430,19 +670,21 @@ let LoadImageAsBackgroundColor = (eventOpenFile) =>
 	openImageInput.value = null;
 }
 
-let load_image = document.getElementById("file-open-image");
-load_image.addEventListener('change', () => { LoadImageAsBackgroundColor(load_image) });
-
-var dropdown_menu = document.querySelectorAll('.dropdown-item');
-
-let array = ["bg-primary", "bg-success", "bg-danger", "bg-warning", "bg-info", "bg-secondary"];
-
-dropdown_menu.forEach(function (item)
+let LoadImageAsBackgroundColorBody = (eventOpenFile) =>
 {
-	item.addEventListener('click', function (event)
-	{
+	let navbarMenu = document.getElementsByTagName('body')[0];
 
-		const index = Array.prototype.indexOf.call(dropdown_menu, event.target);
-		ChangeBackgroundColor(array[index]);
-	});
-});
+	let reader = new FileReader();
+	reader.readAsDataURL(eventOpenFile.files[0]);
+
+	reader.onload = function ()
+	{
+		navbarMenu.style.backgroundImage = `url(${reader.result})`;
+		navbarMenu.style.backgroundRepeat = null;
+		navbarMenu.style.backgroundSize = null;
+		navbarMenu.style.backgroundPosition = null;
+	};
+
+	let openImageInput = document.getElementById('file-open-body');
+	openImageInput.value = null;
+}

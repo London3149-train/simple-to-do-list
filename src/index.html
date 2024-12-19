@@ -1,9 +1,13 @@
 <head>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+		crossorigin="anonymous"></script>
 	<link rel="stylesheet" href="./style.css">
 </head>
+
 <body>
 	<nav class="row navbar navbar-expand-lg navbar-light bg-primary" id="main-menu">
 		<div class="col-2">
@@ -17,42 +21,70 @@
 				<li class="nav-item">
 					<a class="nav-link" href="#">
 						<label for="file-open">
-							<i class="bi bi-arrow-bar-up h3" title="Загрузить задачи из файла"></i>
+							<i class="bi bi-arrow-bar-up h5" title="Загрузить задачи из файла"></i>
 						</label>
 						<input id="file-open" type="file" accept=".json">
 					</a>
 				</li>
 				<li class="nav-item">
 					<a id="btn-save" class="nav-link" href="#" role="button">
-						<i class="bi bi-arrow-down-square h3" title="Сохранить задачи в файл"></i>
+						<i class="bi bi-arrow-down-square h5" title="Сохранить задачи в файл"></i>
 					</a>
 				</li>
 			</ul>
 		</div>
-		<div class="col-6"></div>
-		<div class="col-2">
+		<div class="col-7"></div>
+		<div class="col-1">
 			<div class="btn-group dropstart">
-				<button id= "btnDropDown"type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown"
-						aria-expanded="false">
-					<i class="bi bi-back"></i>
+				<button id="btnDropDown" type="button" class="rounded btn btn-info" data-bs-toggle="dropdown"
+					title="Цвет меню" aria-expanded="false">
+					<i class="bi bi-back" title="Цвет меню"></i>
 				</button>
 				<ul class="dropdown-menu">
 					<li class="d-flex justify-content-evenly">
-						<a class="dropdown-item bg-primary background-color-item"></a>
-						<a class="dropdown-item bg-success background-color-item"></a>
-						<a class="dropdown-item bg-danger background-color-item"></a>
+						<a class="dropdown-item bg-primary background-color-item"
+							onclick="ChangeBackgroundColor('bg-primary')"></a>
+						<a class="dropdown-item bg-success background-color-item"
+							onclick="ChangeBackgroundColor('bg-success')"></a>
+						<a class="dropdown-item bg-danger background-color-item"
+							onclick="ChangeBackgroundColor('bg-danger')"></a>
 					</li>
 					<li class="d-flex justify-content-evenly mt-2">
-						<a class="dropdown-item bg-warning background-color-item"></a>
-						<a class="dropdown-item bg-info background-color-item"></a>
-						<a class="dropdown-item bg-secondary background-color-item"></a>
+						<a class="dropdown-item bg-warning background-color-item"
+							onclick="ChangeBackgroundColor('bg-warning')"></a>
+						<a class="dropdown-item bg-info background-color-item"
+							onclick="ChangeBackgroundColor('bg-info')"></a>
+						<a class="dropdown-item bg-secondary background-color-item"
+							onclick="ChangeBackgroundColor('bg-secondary')"></a>
 					</li>
 					<li class="d-flex justify-content-center mt-2">
 						<a class="nav-link" href="#">
 							<label for="file-open-image">
 								<i class="bi bi-arrow-up-square-fill h1"></i>
 							</label>
-							<input id="file-open-image" class="dropdown-item"  type="file">
+							<input id="file-open-image" class="dropdown-item" type="file">
+						</a>
+					</li>
+				</ul>
+			</div>
+			<div class="btn-group dropstart">
+				<button type="button" class="rounded btn btn-info" data-bs-toggle="dropdown" aria-expanded="false"
+					title="Цвет фон">
+					<i class="bi bi-back" title="Цвет фон"></i>
+				</button>
+				<ul class="dropdown-menu bg-light">
+					<li class="d-flex justify-content-evenly">
+						<a class="nav-link" href="#" onclick="ChangeBackgroundColorBody('bg-light')">
+							<label>
+								<i class="bi bi-square h1" title="Белый фон"></i>
+							</label>
+						</a>
+						<a class="nav-link" href="#">
+							<label for="file-open-body">
+								<i class="bi bi-arrow-up-square-fill h1" title="Загрузка на фон картинки"></i>
+							</label>
+							<input class="dropdown-item" id="file-open-body" type="file"
+								onchange="LoadImageAsBackgroundColorBody(this)">
 						</a>
 					</li>
 				</ul>
@@ -64,8 +96,10 @@
 		<div class="col-4">
 			<p class="text-center">Создать задачу</p>
 			<div class="input-group">
-				<input id="task-text" type="text" class="form-control" placeholder="Введите название задачи" aria-label="Введите название задачи" aria-describedby="button-addon">
-				<button id="button-addon" class="btn btn-outline-secondary" type="reset">Добавить задачу в список</button>
+				<input id="task-text" type="text" class="form-control" placeholder="Введите название задачи"
+					aria-label="Введите название задачи" aria-describedby="button-addon">
+				<button id="button-addon" class="btn btn-outline-secondary" type="reset">Добавить задачу в
+					список</button>
 			</div>
 		</div>
 	</div>

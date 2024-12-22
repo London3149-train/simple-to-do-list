@@ -256,11 +256,6 @@ class DatepickerField
 	{
 		return this.#_fieldInHtmlDocument;
 	}
-
-	get newDate()
-	{
-		return this.#_datepicker.valueAsDate;
-	}
 }
 
 class TaskList
@@ -607,7 +602,11 @@ let LoadDataFromFile = (eventOpenFile) =>
 }
 
 let btn_fo = document.getElementById("file-open");
-btn_fo.addEventListener('change', () => { LoadDataFromFile(btn_fo) });
+btn_fo.addEventListener('change', () =>
+{
+	LoadDataFromFile(btn_fo);
+	btn_fo.value = null;
+});
 
 
 let SaveDataToFile = (downloadButton, fileName = 'data') =>
